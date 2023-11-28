@@ -92,10 +92,10 @@ BEGIN
             VALUE "CompanyName", "dev.toxikat.jsoneditor" "\0"
             VALUE "FileDescription", "jsoneditor" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "jsoneditor" "\0"
+            VALUE "InternalName", "JSON Editor" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 dev.toxikat.jsoneditor. All rights reserved." "\0"
-            VALUE "OriginalFilename", "jsoneditor.exe" "\0"
-            VALUE "ProductName", "jsoneditor" "\0"
+            VALUE "OriginalFilename", "JSON_Editor.exe" "\0"
+            VALUE "ProductName", "JSON Editor" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 ValueNotifier<bool> useSystemTheme = ValueNotifier<bool>(true);
@@ -55,7 +54,6 @@ void saveJsonValues(Map outJson) async {
   if (jsonPath.value.isNotEmpty) {
     JsonEncoder encoder = const JsonEncoder.withIndent("  ");
     String dumpJson = encoder.convert(outJson);
-    print(dumpJson);
     await File(jsonPath.value).writeAsString(dumpJson);
   }
 }

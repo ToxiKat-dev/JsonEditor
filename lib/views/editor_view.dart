@@ -261,6 +261,7 @@ class _EditingviewState extends State<Editingview> {
     Color currentTextColor = Theme.of(context).textTheme.bodyMedium!.color!;
     List<String> reorderedList = List.from(itemList);
     ValueNotifier<bool> isUpdated = ValueNotifier<bool>(false);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -272,66 +273,69 @@ class _EditingviewState extends State<Editingview> {
           padding: const EdgeInsets.all(16.0),
           child: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              return Container(
-                width: double.maxFinite,
-                decoration: const BoxDecoration(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(20.0)),
-                ),
-                child: ReorderableListView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  itemBuilder: (context, index) {
-                    return ReorderableDragStartListener(
-                      key: ValueKey(reorderedList[index]),
-                      index: index,
-                      child: Padding(
-                        key: ValueKey(reorderedList[index]),
-                        padding: const EdgeInsets.all(4.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: currentTextColor),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ListTile(
-                            title: Text(reorderedList[index]),
-                          ),
-                        ),
+              return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ReorderableListView.builder(
+                        padding: const EdgeInsets.all(8.0),
+                        itemBuilder: (context, index) {
+                          return ReorderableDragStartListener(
+                            key: ValueKey(reorderedList[index]),
+                            index: index,
+                            child: Padding(
+                              key: ValueKey(reorderedList[index]),
+                              padding: const EdgeInsets.all(4.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: currentTextColor),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: ListTile(
+                                  title: Text(reorderedList[index]),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        itemCount: reorderedList.length,
+                        onReorder: (oldIndex, newIndex) {
+                          setState(() {
+                            if (oldIndex < newIndex) {
+                              newIndex -= 1;
+                            }
+                            final String item =
+                                reorderedList.removeAt(oldIndex);
+                            reorderedList.insert(newIndex, item);
+                          });
+                        },
                       ),
-                    );
-                  },
-                  itemCount: reorderedList.length,
-                  onReorder: (oldIndex, newIndex) {
-                    setState(() {
-                      if (oldIndex < newIndex) {
-                        newIndex -= 1;
-                      }
-                      final String item = reorderedList.removeAt(oldIndex);
-                      reorderedList.insert(newIndex, item);
-                    });
-                  },
-                  footer: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("cancel"),
-                        ),
-                        const SizedBox(width: 16),
-                        TextButton(
-                          onPressed: () {
-                            reorderJsonKeys(reorderedList);
-                            Navigator.of(context).pop();
-                            isUpdated.value = true;
-                          },
-                          child: const Text("Save"),
-                        ),
-                      ],
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("cancel"),
+                          ),
+                          const SizedBox(width: 16),
+                          TextButton(
+                            onPressed: () {
+                              reorderJsonKeys(reorderedList);
+                              Navigator.of(context).pop();
+                              isUpdated.value = !isUpdated.value;
+                            },
+                            child: const Text("Save"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               );
             },

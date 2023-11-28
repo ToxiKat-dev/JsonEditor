@@ -15,7 +15,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Firebase Automation"),
+        title: const Text("JSON Editor"),
         actions: [
           IconButton(
             onPressed: () {

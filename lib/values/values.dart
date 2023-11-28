@@ -55,6 +55,7 @@ void saveJsonValues(Map outJson) async {
   if (jsonPath.value.isNotEmpty) {
     JsonEncoder encoder = const JsonEncoder.withIndent("  ");
     String dumpJson = encoder.convert(outJson);
+    print(dumpJson);
     await File(jsonPath.value).writeAsString(dumpJson);
   }
 }
@@ -67,5 +68,37 @@ Future<void> addJsonKeyValues(String key, String value) async {
     JsonEncoder encoder = const JsonEncoder.withIndent("  ");
     String dumpJson = encoder.convert(jsonData);
     await File(jsonPath.value).writeAsString(dumpJson);
+  }
+}
+
+Future deleteJsonKeyValues(List toNotDelete) async {
+  if (jsonPath.value.isNotEmpty) {
+    Map out = {};
+    final String response = await File(jsonPath.value).readAsString();
+    Map<String, dynamic> jsonData = json.decode(response);
+    for (MapEntry entry in jsonData.entries) {
+      String curKey = entry.key;
+      if (toNotDelete.contains(curKey)) {
+        out[curKey] = entry.value;
+      }
+    }
+    saveJsonValues(out);
+  }
+}
+
+Future reorderJsonKeys(List reorderedList) async {
+  if (jsonPath.value.isNotEmpty) {
+    Map out = {};
+    for (String i in reorderedList) {
+      out[i] = "";
+    }
+    final String response = await File(jsonPath.value).readAsString();
+    Map<String, dynamic> jsonData = json.decode(response);
+    for (MapEntry entry in jsonData.entries) {
+      if (reorderedList.contains(entry.key)) {
+        out[entry.key] = entry.value;
+      }
+    }
+    saveJsonValues(out);
   }
 }

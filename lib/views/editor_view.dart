@@ -110,55 +110,7 @@ class _EditingviewState extends State<Editingview> {
                         ),
                       ),
                     ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          final TextEditingController keyController =
-                              TextEditingController();
-                          final TextEditingController valueController =
-                              TextEditingController();
-                          return AlertDialog(
-                            title: const Text("Add Key Value Pair"),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextFormField(
-                                  decoration: const InputDecoration(
-                                      label: Text("Enter Key")),
-                                  controller: keyController,
-                                ),
-                                TextFormField(
-                                  decoration: const InputDecoration(
-                                      label: Text("Enter Value")),
-                                  controller: valueController,
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Cancel"),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  if (keyController.text.isNotEmpty) {
-                                    addJsonKeyValues(keyController.text,
-                                        valueController.text);
-                                  }
-
-                                  Navigator.of(context).pop();
-                                  setState(() {});
-                                },
-                                child: const Text("Add"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
+                    onPressed: addDialog,
                     tooltip: "Add key value pair",
                     icon: const Icon(Icons.add),
                   ),
@@ -189,6 +141,51 @@ class _EditingviewState extends State<Editingview> {
         } else {
           return const Center(child: CircularProgressIndicator());
         }
+      },
+    );
+  }
+
+  void addDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController keyController = TextEditingController();
+        final TextEditingController valueController = TextEditingController();
+        return AlertDialog(
+          title: const Text("Add Key Value Pair"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(label: Text("Enter Key")),
+                controller: keyController,
+              ),
+              TextFormField(
+                decoration: const InputDecoration(label: Text("Enter Value")),
+                controller: valueController,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                if (keyController.text.isNotEmpty) {
+                  addJsonKeyValues(keyController.text, valueController.text);
+                }
+
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+              child: const Text("Add"),
+            ),
+          ],
+        );
       },
     );
   }
@@ -247,9 +244,9 @@ class _EditingviewState extends State<Editingview> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () async {
+              onPressed: () {
+                deleteJsonKeyValues(itemList);
                 Navigator.of(context).pop();
-                await deleteJsonKeyValues(itemList);
                 setState(() {});
               },
               child: const Text('Save'),
@@ -263,75 +260,82 @@ class _EditingviewState extends State<Editingview> {
   void reorderDialog(List<String> itemList) {
     Color currentTextColor = Theme.of(context).textTheme.bodyMedium!.color!;
     List<String> reorderedList = List.from(itemList);
-
+    ValueNotifier<bool> isUpdated = ValueNotifier<bool>(false);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              width: double.maxFinite,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-              ),
-              child: ReorderableListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemBuilder: (context, index) {
-                  return ReorderableDragStartListener(
-                    key: ValueKey(reorderedList[index]),
-                    index: index,
-                    child: Padding(
+        isUpdated.addListener(() {
+          setState(() {});
+        });
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Container(
+                width: double.maxFinite,
+                decoration: const BoxDecoration(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20.0)),
+                ),
+                child: ReorderableListView.builder(
+                  padding: const EdgeInsets.all(8.0),
+                  itemBuilder: (context, index) {
+                    return ReorderableDragStartListener(
                       key: ValueKey(reorderedList[index]),
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: currentTextColor),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ListTile(
-                          title: Text(reorderedList[index]),
+                      index: index,
+                      child: Padding(
+                        key: ValueKey(reorderedList[index]),
+                        padding: const EdgeInsets.all(4.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: currentTextColor),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            title: Text(reorderedList[index]),
+                          ),
                         ),
                       ),
+                    );
+                  },
+                  itemCount: reorderedList.length,
+                  onReorder: (oldIndex, newIndex) {
+                    setState(() {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+                      final String item = reorderedList.removeAt(oldIndex);
+                      reorderedList.insert(newIndex, item);
+                    });
+                  },
+                  footer: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("cancel"),
+                        ),
+                        const SizedBox(width: 16),
+                        TextButton(
+                          onPressed: () {
+                            reorderJsonKeys(reorderedList);
+                            Navigator.of(context).pop();
+                            isUpdated.value = true;
+                          },
+                          child: const Text("Save"),
+                        ),
+                      ],
                     ),
-                  );
-                },
-                itemCount: reorderedList.length,
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (oldIndex < newIndex) {
-                      newIndex -= 1;
-                    }
-                    final String item = reorderedList.removeAt(oldIndex);
-                    reorderedList.insert(newIndex, item);
-                  });
-                },
-                footer: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("cancel"),
-                      ),
-                      const SizedBox(width: 16),
-                      TextButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          await reorderJsonKeys(reorderedList);
-                          setState(() {});
-                        },
-                        child: const Text("Save"),
-                      ),
-                    ],
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

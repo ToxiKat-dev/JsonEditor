@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jsoneditor/values/values.dart';
+import 'package:jsoneditor/widgets/form_text_tile.dart';
 
 class Editingview extends StatefulWidget {
   const Editingview({super.key});
@@ -31,9 +32,8 @@ class _EditingviewState extends State<Editingview> {
                       text: editableValues[index]["value"],
                     ),
                   );
-                  return TextFormField(
-                    decoration: InputDecoration(
-                        label: Text(editableValues[index]["key"])),
+                  return FormTextTile(
+                    name: editableValues[index]["key"],
                     controller: controllerList[index],
                   );
                 },

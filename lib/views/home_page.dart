@@ -39,7 +39,19 @@ class _HomePageState extends State<HomePage> {
       setState(() {});
     });
     if (jsonPath.value.isEmpty) {
-      return const Center(child: Text("Set the path to the json file"));
+      return const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Set the Path to the json file"),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: getJsonPath,
+              child: Text("Set Path"),
+            ),
+          ],
+        ),
+      );
     } else {
       return const Editingview();
     }

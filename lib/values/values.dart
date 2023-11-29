@@ -2,15 +2,18 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:file_picker/file_picker.dart';
 
 ValueNotifier<bool> useSystemTheme = ValueNotifier<bool>(true);
 ValueNotifier<bool> isDarkTheme = ValueNotifier<bool>(false);
+ValueNotifier<bool> defaultExpand = ValueNotifier<bool>(false);
 ValueNotifier<String> jsonPath = ValueNotifier<String>("");
 
 void initValues() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   useSystemTheme.value = prefs.getBool("useSystemTheme") ?? true;
   isDarkTheme.value = prefs.getBool("isDarkTheme") ?? false;
+  defaultExpand.value = prefs.getBool("defaultExpand") ?? false;
   jsonPath.value = prefs.getString("jsonPath") ?? "";
 
   useSystemTheme.addListener(
@@ -23,11 +26,24 @@ void initValues() async {
       await prefs.setBool("isDarkTheme", isDarkTheme.value);
     },
   );
+  defaultExpand.addListener(
+    () async {
+      await prefs.setBool("defaultExpand", defaultExpand.value);
+    },
+  );
   jsonPath.addListener(
     () async {
       await prefs.setString("jsonPath", jsonPath.value);
     },
   );
+}
+
+void getJsonPath() async {
+  FilePickerResult? jsonFile = await FilePicker.platform.pickFiles();
+  if (jsonFile != null) {
+    jsonPath.value = jsonFile.files.single.path ?? "";
+    print(jsonPath.value);
+  }
 }
 
 void deletevalues() async {

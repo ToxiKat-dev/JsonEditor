@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jsoneditor/values/values.dart';
 
@@ -19,6 +18,11 @@ class _SettingsPageState extends State<SettingsPage> {
       } finally {}
     });
     isDarkTheme.addListener(() {
+      try {
+        setState(() {});
+      } finally {}
+    });
+    defaultExpand.addListener(() {
       try {
         setState(() {});
       } finally {}
@@ -50,13 +54,22 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ListTile(
+            title: const Text("Is Expanded by default"),
+            trailing: Switch(
+              value: defaultExpand.value,
+              onChanged: (value) {
+                defaultExpand.value = value;
+              },
+            ),
+          ),
+          ListTile(
             title: const Text("Json Path"),
             trailing: ElevatedButton(
               style: ButtonStyle(
                   shape: MaterialStatePropertyAll(
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               )),
-              onPressed: selectjsonfile,
+              onPressed: getJsonPath,
               child: const Text("Set Path"),
             ),
           ),
@@ -74,13 +87,5 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
-  }
-
-  void selectjsonfile() async {
-    FilePickerResult? jsonFile = await FilePicker.platform.pickFiles();
-    if (jsonFile != null) {
-      jsonPath.value = jsonFile.files.single.path ?? "";
-      print(jsonPath.value);
-    }
   }
 }
